@@ -1,5 +1,5 @@
 # face_features_detection-FlaskAPI
-Instruction to build a vertical search engine
+Instruction to build a flask-API
 
 
 ## step 1: create a virtual environment
