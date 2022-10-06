@@ -1,11 +1,9 @@
+import os
+
+import cv2
 from flask import Flask, request
 from retinaface import RetinaFace
-import cv2
-import os
-import matplotlib.pyplot as plt
-import pandas as pd
 from werkzeug.utils import secure_filename
-import json
 
 app = Flask(__name__)
 
@@ -48,7 +46,7 @@ def upload_file():
         if request.files['file'] != "":
             f = request.files['file']
             filename = secure_filename(f.filename)
-            file_loc = os.path.join(app.config['UPLOAD_FOLDER'], f.filename)
+            file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             f.save(file_loc)
 
             img = cv2.imread(file_loc)
