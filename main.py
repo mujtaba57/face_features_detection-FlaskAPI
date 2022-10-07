@@ -42,6 +42,7 @@ def face_landmark(img):
 
 @app.route("/upload-img/", methods = ['POST'])
 def upload_file():
+    global file_loc, response_path
     if request.method == "POST":
         if request.files['file'] != "":
             f = request.files['file']
