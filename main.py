@@ -1,5 +1,5 @@
 import os
-
+from rembg import remove
 import cv2
 from flask import Flask, request
 from retinaface import RetinaFace
@@ -15,6 +15,12 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
 def face_landmark(img):
+    """
+    It takes an image as input, and returns the image with the facial landmarks drawn on it
+    
+    :param img: The image to be processed
+    :return: the image with the facial landmarks drawn on it.
+    """
     result = RetinaFace.detect_faces(img)
     for key in result.keys():
         identify = result[key]
@@ -40,8 +46,13 @@ def face_landmark(img):
 
 
 
-@app.route("/upload-img/", methods = ['POST'])
+@app.route("/find-face/", methods = ['POST'])
 def upload_file():
+    """
+    It takes the uploaded image, runs it through the face_landmark function, and then saves the image to
+    the same directory as the app.py file
+    :return: The path of the image that was uploaded.
+    """
     global file_loc, response_path
     if request.method == "POST":
         if request.files['file'] != "":
@@ -56,6 +67,30 @@ def upload_file():
             response_path = os.path.abspath(f.filename)
              
         os.remove(file_loc)  
+        return response_path
+
+
+@app.route("/rm-bg/", methods = ['POST'])
+def remove_bg():
+    """
+    It takes the uploaded image, removes the background, and saves the image with the background removed
+    :return: The path of the image with the background removed.
+    """
+    global file_loc, response_path
+    if request.method == "POST":
+        if request.files['file'] != "":
+            f = request.files['file']
+            filename = secure_filename(f.filename)
+            file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            f.save(file_loc)
+
+            img = cv2.imread(file_loc)
+            rem_bg = remove(img)
+            file_name = f.filename.split(".")
+            cv2.imwrite(file_name[0]+"-rm"+".png", rem_bg)
+            response_path = os.path.abspath(os.path.join(file_name[0]+"-rm"+".png"))
+
+        os.remove(file_loc)
         return response_path
 
 
