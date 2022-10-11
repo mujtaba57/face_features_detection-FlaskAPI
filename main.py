@@ -93,6 +93,20 @@ def remove_bg():
         os.remove(file_loc)
         return response_path
 
+@app.route("/comapre-face/", methods=['POST'])
+def compare_face():
+    if request.method == "POST":
+        files = request.files.getlist('file')
+        file_names = []
+        for file in files:
+            if file:
+                filename = secure_filename(file.filename)
+                file_names.append(filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                print(filename)
+        return "both file recieved"
+    else:
+        return "error"
 
 if __name__ == '__main__':
    app.run(host="0.0.0.0", debug=False, port=5000)
