@@ -1,9 +1,15 @@
 import os
 from rembg import remove
 import cv2
+from deepface import DeepFace
 from flask import Flask, request
 from retinaface import RetinaFace
 from werkzeug.utils import secure_filename
+from flasgger import Swagger
+from flasgger.utils import swag_from
+from flasgger import LazyString, LazyJSONEncoder
+
+
 
 app = Flask(__name__)
 
@@ -12,6 +18,30 @@ ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg'])
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
+app.config["SWAGGER"] = {"title": "Swagger-UI", "uiversion": 2}
+
+swagger_config = {
+    "headers": [],
+    "specs": [
+        {
+            "endpoint": "apispec_1",
+            "route": "/apispec_1.json",
+            "rule_filter": lambda rule: True,  # all in
+            "model_filter": lambda tag: True,  # all in
+        }
+    ],
+    "static_url_path": "/flasgger_static",
+    # "static_folder": "static",  # must be set by user
+    "swagger_ui": True,
+    "specs_route": "/swagger/",
+}
+
+template = dict(
+    swaggerUiPrefix=LazyString(lambda: request.environ.get("HTTP_X_SCRIPT_NAME", ""))
+)
+
+app.json_encoder = LazyJSONEncoder
+swagger = Swagger(app, config=swagger_config, template=template)
 
 
 def face_landmark(img):
@@ -45,7 +75,7 @@ def face_landmark(img):
 
 
 
-
+@swag_from("./config_files/find_face_swagger_config.yml")
 @app.route("/find-face/", methods = ['POST'])
 def upload_file():
     """
@@ -83,7 +113,6 @@ def remove_bg():
             filename = secure_filename(f.filename)
             file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             f.save(file_loc)
-
             img = cv2.imread(file_loc)
             rem_bg = remove(img)
             file_name = f.filename.split(".")
@@ -93,6 +122,36 @@ def remove_bg():
         os.remove(file_loc)
         return response_path
 
+def compare_face(img1, img2, model_name="VGG-Face", det_back="mtcnn"):
+  result = DeepFace.verify(img1, img2, model_name=model_name, detector_backend=det_back, prog_bar=True)
+  return result
+
+@swag_from("./config_files/compare_face_swagger_config.yml")
+@app.route("/comapre-face/", methods=['POST'])
+def compare_face_api():
+    if request.method == "POST":
+        if request.files['file1'] != "" and request.files['file2'] != "":
+            f1 = request.files['file1']
+            f2 = request.files['file2']
+            filename1, filename2 = secure_filename(f1.filename), secure_filename(f2.filename)
+            file_loc1, file_loc2 = os.path.join(app.config['UPLOAD_FOLDER'], filename1), os.path.join(app.config['UPLOAD_FOLDER'], filename2)
+            f1.save(file_loc1)
+            f2.save(file_loc2)
+
+            file_loc = os.listdir("./uploads/")
+
+            img1 = cv2.imread(os.path.join(app.config['UPLOAD_FOLDER'], file_loc[0]))
+            img2 = cv2.imread(os.path.join(app.config['UPLOAD_FOLDER'], file_loc[1]))
+            result = compare_face(img1, img2)
+
+            for file in file_loc:
+                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], file))
+            return result
+
+        else:
+            return "two files required"
+    else:
+        return "error request"
 
 if __name__ == '__main__':
-   app.run(host="0.0.0.0", debug=False, port=5000)
+    app.run(host="0.0.0.0", debug=False, port=5000)
