@@ -1,5 +1,5 @@
-summary: "Find-face Features"
-description: "This is a simple API which returns landmarks of faces"
+summary: "Remove Background From Images"
+description: "This is a simple API which removes the background of every image"
 consumes:
 - "application/json"
 produces:
@@ -15,13 +15,11 @@ parameters:
     properties:
       file:
         type: "file"
-        format: [".png", ".jpg"]
+        format: [".png", ".jpg", ".jpeg"]
 
 responses:
   200:
     description: "file recieved"
-  204:
-    description: "Face not Found"
   422:
     description: "Invalid File Format"
   500:
