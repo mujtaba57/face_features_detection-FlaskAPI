@@ -32,6 +32,9 @@ parameters:
 responses:
   200:
     description: "file recieved"
-
-  404:
-    description: "not found"
+  405:
+    description: "Both File required"
+  422:
+    description: "Invalid File Format"
+  500:
+    description: "internal server error"
