@@ -1,4 +1,4 @@
-summary: "Compare-face"
+summary: "Compare-faces between 2 Images"
 description: "This is a simple API which returns similarity between two faces"
 consumes:
 - "application/json"
@@ -32,6 +32,9 @@ parameters:
 responses:
   200:
     description: "file recieved"
-
-  404:
-    description: "not found"
+  405:
+    description: "Both File required"
+  422:
+    description: "Invalid File Format"
+  500:
+    description: "internal server error"
