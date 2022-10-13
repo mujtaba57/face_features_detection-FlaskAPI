@@ -1,0 +1,40 @@
+summary: "Compare-faces between 2 Images"
+description: "This is a simple API which returns similarity between two faces"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+parameters:
+- in: "formData"
+  id: 1
+  name: "file1"
+  description: "file to upload"
+  required: true
+  type: "file"
+  schema:
+    type: "object"
+    properties:
+      file:
+        type: "file"
+        format: [".png", ".jpg"]
+- in: "formData"
+  id: 2
+  name: "file2"
+  description: "file to upload"
+  required: true
+  type: "file"
+  schema:
+    type: "object"
+    properties:
+      file:
+        type: "file"
+        format: [".png", ".jpg"]
+responses:
+  200:
+    description: "file recieved"
+  405:
+    description: "Both File required"
+  422:
+    description: "Invalid File Format"
+  500:
+    description: "internal server error"

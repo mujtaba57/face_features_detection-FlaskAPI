@@ -1,0 +1,26 @@
+summary: "Remove Background From Images"
+description: "This is a simple API which removes the background of every image"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+parameters:
+- in: "formData"
+  name: "file"
+  description: "file to upload"
+  required: true
+  type: "file"
+  schema:
+    type: "object"
+    properties:
+      file:
+        type: "file"
+        format: [".png", ".jpg", ".jpeg"]
+
+responses:
+  200:
+    description: "file recieved"
+  422:
+    description: "Invalid File Format"
+  500:
+    description: "internal server error"
