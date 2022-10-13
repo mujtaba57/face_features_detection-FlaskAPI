@@ -1,4 +1,4 @@
-summary: "Remove Backgroung"
+summary: "Remove Background"
 description: "This is a simple API which removes the background of every image"
 consumes:
 - "application/json"
