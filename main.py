@@ -150,5 +150,32 @@ def compare_face_api():
         return Response(e.args[0], status=500, mimetype='application/json')
 
 
+@swag_from("./config_files/analyze_face_swagger_config.yml")
+@app.route("/analyze-face/", methods=['POST'])
+def analyze_faces():
+    try:
+        # result =  {}
+        if request.method == "POST":
+            if request.files['file'] != "":
+                f = request.files['file']
+                valid_input = f.filename.lower().endswith(ALLOWED_EXTENSIONS)
+                if valid_input:
+                    filename = secure_filename(f.filename)
+                    file_loc = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                    f.save(file_loc)
+                    img = cv2.imread(file_loc)
+                    result = json.dumps(analyze_image(img))
+                    if result != "":
+                        os.remove(file_loc)
+                        return Response(result, status=200, mimetype='application/json')
+                    else:
+                        os.remove(file_loc)
+                        return Response("Face not Found", status=204, mimetype='application/json')
+                else:
+                    return Response("Invalid File Format", status=422, mimetype='application/json')
+
+    except Exception as e:
+        return Response(e.args[0], status=500, mimetype='application/json')
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", debug=False, port=5005)

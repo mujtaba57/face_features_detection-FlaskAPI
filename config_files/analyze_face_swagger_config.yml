@@ -1,0 +1,28 @@
+summary: "Analyze-face Features"
+description: "This is a simple API which describe features of face"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+parameters:
+- in: "formData"
+  name: "file"
+  description: "file to upload"
+  required: true
+  type: "file"
+  schema:
+    type: "object"
+    properties:
+      file:
+        type: "file"
+        format: [".png", ".jpg"]
+
+responses:
+  200:
+    description: "file recieved"
+  204:
+    description: "Face not Found"
+  422:
+    description: "Invalid File Format"
+  500:
+    description: "internal server error"

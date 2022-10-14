@@ -55,3 +55,6 @@ def compare_face(img1, img2, model="VGG-Face", det_back="mtcnn"):
     result = DeepFace.verify(img1, img2, model_name=model, detector_backend=det_back, prog_bar=True)
     return result
 
+def analyze_image(img_name):
+  obj = DeepFace.analyze(img_path = img_name, actions = ['age', 'gender', 'race', 'emotion'])
+  return obj
