@@ -153,8 +153,12 @@ def compare_face_api():
 @swag_from("./config_files/analyze_face_swagger_config.yml")
 @app.route("/analyze-face/", methods=['POST'])
 def analyze_faces():
+    """
+    It takes a POST request with a file attached, saves the file, analyzes the image, and returns the
+    result
+    :return: a response object with the result of the analysis.
+    """
     try:
-        # result =  {}
         if request.method == "POST":
             if request.files['file'] != "":
                 f = request.files['file']
